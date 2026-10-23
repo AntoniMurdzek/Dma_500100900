@@ -771,7 +771,7 @@ Jesteś agentem nieruchomości, masz klientowi pokazać:
 - 1 sypialnia
 - 1 łazienka
 - pokaż je według typu
-- posortuj od najdroższych i od największej powierzchni
+- posortuj od najdroższych i od największej powierzchni   
 
 
 ``` {r}
