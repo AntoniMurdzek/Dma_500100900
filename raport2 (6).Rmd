@@ -23,6 +23,7 @@ library(tidyverse)   #pakiet wranglingowy, z fajkami i grafiką ggplot2
 library(rmdformats)  #pakiet z szablonami Markdown
 library(magrittr)   # pakiet do fajek
 library(lubridate)  # pakiet do operacji na datach
+"Jesteś agentem nieruchomości. Zestawienie: mieszkania do 50m2, 1 sypialnia, 1 łazienka, poakż wg typu, posortuj od najdroższych do najtańszych, mają być jak największe powierzchnie"
 ```
 
 ## Operatory
