@@ -727,6 +727,13 @@ tibble(
   y = 1, 
   z = x ^ 2 + y
 )
+standaryzacja <- function(x) {
+srednia = mean(x)
+odchyl = sd(x)
+z_norm = (x-srednia)/odchyl
+return(z_norm)
+}
+standaryzacja(4)  
 ```
 
 Jeśli jesteś już zaznajomiony z data.frame(), zauważ, że tibble() robi znacznie mniej: nigdy nie zmienia typu danych wejściowych (np. nigdy nie konwertuje ciągów znaków na współczynniki!), nigdy nie zmienia nazw zmiennych i nie tworzy nazw wierszy.
@@ -747,3 +754,13 @@ Zadanie wykonaj w kilku etapach:
 4.  Napisz własną funkcję, która wykonywać będzie standaryzowanie zmiennych.
 5.  Utwórz nową zmienną "cena" w tibble "dane2", która będzie zestandaryzowaną price, korzystając z własnej funkcji.
 6.  Wykreśl cenę oraz price na wykresach ramkowych obok siebie na jednym ekranie. Różnice?
+
+standaryzacja <- function(x) {
+srednia = mean(x)
+odchyl = sd(x)
+z = (x-srednia)/odchyl
+return(z)
+}
+standaryzacja(4)
+
+
