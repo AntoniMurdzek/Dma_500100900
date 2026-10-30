@@ -766,4 +766,25 @@ return(z)
 }
 standaryzacja(4)
 
+### Zadanie 3 do wykonania
+
+Jesteś agentem nieruchomości, masz klientowi pokazać:
+- mieszkanie do 100m2
+- 1 sypialnia
+- 1 łazienka
+- pokaż je według typu
+- posortuj od najdroższych i od największej powierzchni   
+
+
+``` {r}
+dane %>%
+  mutate(sq__m = sq__ft * 0.09290304) %>%
+  filter(beds == 1 & baths == 1 & sq__m <= 100) %>%
+  group_by(type) %>%
+  arrange(-price) %>%
+  arrange(-sq__m) %>%
+  rename(typ=type) %>%
+  select(city, beds, baths, price, sq__m) %>%
+  print
+```
 
