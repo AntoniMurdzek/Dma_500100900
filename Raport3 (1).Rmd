@@ -131,6 +131,8 @@ nier <- raw_nier
 names(nier) <- c("id", "wiek_lat", "metro_m", "sklepy", "lat", "lon",
                  "cena_10k_twd_ping")
 head(nier)
+domy <- read.csv("C:/Users/antek/Desktop/Klon Flisikowskiego/Dma_500100900/real_estate.csv")
+View(domy)
 ```
 
 | Zmienna | Znaczenie |
@@ -144,6 +146,11 @@ head(nier)
 ### Zadanie 1 — najpierw sprawdź tabelę
 
 Sprawdź liczbę rekordów i kolumn, typy danych, liczbę braków oraz podstawowe statystyki. Zweryfikuj, czy `id` jest unikatowe. Wskaż zmienne liczbowe, których nie powinno się interpretować jako zwykłych miar ilościowych (np. identyfikator).
+summary(domy)
+colSums(is.na(domy))
+nrow(domy)
+ncol(domy)
+anyDuplicated(domy$No)
 
 ```{r nier-zad-1}
 # WASZE ROZWIĄZANIE
@@ -157,6 +164,32 @@ Dodaj kolumnę `cena_twd_m2`: `cena_10k_twd_ping * 10000 / 3.3`. Oblicz minimum,
 
 Pytanie: czy średnia jest wyższa od mediany? Co to mówi o rozkładzie cen? Nie interpretuj tej ceny jako wartości całego lokalu.
 
+library(dplyr)
+library(tidyr)
+
+adres_nieruchomosci <- paste0(
+  "https://raw.githubusercontent.com/kflisikowsky/pandas_exercises/",
+  "62863036107888c0c7273c40e8d309a43f4da3a9/data/models/real_estate.csv"
+)
+raw_nier <- read.csv(adres_nieruchomosci, check.names = FALSE)
+stopifnot(nrow(raw_nier) == 414, ncol(raw_nier) == 7)
+
+nier <- raw_nier
+names(nier) <- c("id", "wiek_lat", "metro_m", "sklepy", "lat", "lon",
+                 "cena_10k_twd_ping")
+nier
+nier %>%
+mutate(cena_twd_m2 = cena_10k_twd_ping * 10000/3.3) %>%
+summary() 
+
+nier
+nier %>%
+mutate(cena_twd_m2 = cena_10k_twd_ping * 10000/3.3) %>%
+arrange(desc(cena_twd_m2)) %>%
+head() %>%
+View()
+
+domy$cena_twd_m2 <- domy$cena_10k_twd_ping * 10000/3.3
 ```{r nier-zad-2}
 # WASZE ROZWIĄZANIE
 # mutate(), summarise(), arrange(desc(...)), slice_head(n = 5)
@@ -169,6 +202,12 @@ Policz, ile nieruchomości znajduje się w odległości do 500 m od stacji oraz 
 
 Wynik opisz jednym zdaniem z liczbami i jednostkami. To proste porównanie opisowe, a nie dowód, że odległość powoduje zmianę ceny.
 
+names(nier)
+nier %>%
+mutate(cena_twd_m2 = cena_10k_twd_ping * 10000/3.3, blisko_metra = metro_m <= 500) %>%
+group_by(blisko_metra) %>%
+summarise(liczba = n(), mediana = median(cena_twd_m2, na.rm = TRUE)) %>%
+View()
 ```{r nier-zad-3}
 # WASZE ROZWIĄZANIE
 # Wskazówka: mutate(blisko_metra = metro_m <= 500)
@@ -182,12 +221,51 @@ Podziel obserwacje na trzy strefy odległości od metra: **do 500 m**, **powyże
 
 Następnie sprawdź, czy wśród budynków w wieku najwyżej 20 lat ranking median stref pozostaje taki sam. Dlaczego porównanie wszystkich budynków może różnić się od porównania budynków młodszych?
 
-```{r nier-strefy-przyklad}
-# Przykład tworzenia zmiennej grupującej
-nier <- nier %>% mutate(
-  strefa = cut(metro_m, c(-Inf, 500, 1500, Inf),
-               labels = c("do 500 m", "500–1500 m", "ponad 1500 m"))
+library(dplyr)
+library(tidyr)
+
+adres_nieruchomosci <- paste0(
+  "https://raw.githubusercontent.com/kflisikowsky/pandas_exercises/",
+  "62863036107888c0c7273c40e8d309a43f4da3a9/data/models/real_estate.csv"
 )
+raw_nier <- read.csv(adres_nieruchomosci, check.names = FALSE)
+stopifnot(nrow(raw_nier) == 414, ncol(raw_nier) == 7)
+
+nier <- raw_nier
+names(nier) <- c("id", "wiek_lat", "metro_m", "sklepy", "lat", "lon",
+                 "cena_10k_twd_ping")
+nier
+nier %>%
+mutate(cena_twd_m2 = cena_10k_twd_ping * 10000/3.3) %>%
+summary() 
+
+nier
+nier %>%
+mutate(cena_twd_m2 = cena_10k_twd_ping * 10000/3.3) %>%
+arrange(desc(cena_twd_m2)) %>%
+head() %>%
+View()
+
+nier$cena_twd_m2 <- nier$cena_10k_twd_ping * 10000/3.3
+
+nier$strefa = cut(nier$metro_m, c(-Inf, 500, 1500, Inf),
+               labels = c("do 500 m", "500–1500 m", "ponad 1500 m"))
+nier1 <- nier %>% 
+ 
+  group_by(strefa) %>%
+  filter(wiek_lat <= 20) %>%
+  summarise(mediana_strefa = median(metro_m, na.rm = TRUE), `liczba obserwacji` = n(), mediana_ceny = median(cena_twd_m2, na.rm = TRUE), mediana_wiek = median(wiek_lat, na.rm = TRUE), średnia_il_sklepów = mean(sklepy, na.rm = TRUE)) %>%
+
+print()
+
+nier2 <- nier %>% 
+ 
+  group_by(strefa) %>%
+  summarise(mediana_strefa = median(metro_m, na.rm = TRUE), `liczba obserwacji` = n(), mediana_ceny = median(cena_twd_m2, na.rm = TRUE), mediana_wiek = median(wiek_lat, na.rm = TRUE), średnia_il_sklepów = mean(sklepy, na.rm = TRUE)) %>%
+
+print()
+```{r nier-strefy-przyklad}
+
 ```
 
 ```{r nier-zad-4}
